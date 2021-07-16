@@ -12,6 +12,7 @@ const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
 
+
 class Blockchain {
 
     /**
@@ -75,7 +76,7 @@ class Blockchain {
                 block.previousBlockHash = null;
             } else {
                 //set previous Block Hash
-                block.previousBlockHash = this.hash;
+                block.previousBlockHash = self.chain[block.height - 1].hash;
             }
 
             // Set Block Hash for Current Block
@@ -110,7 +111,9 @@ class Blockchain {
      */
     requestMessageOwnershipVerification(address) {
         return new Promise((resolve) => {
-            resolve(`${address}:${new Date().getTime().toString().slice(0,-3)}:starRegistry`);
+            //Create messeage 
+            var newMessage = `${address}:${new Date().getTime().toString().slice(0,-3)}:starRegistry`;
+            resolve(newMessage);
         });
     }
 
@@ -215,15 +218,15 @@ class Blockchain {
     getStarsByWalletAddress (address) {
         let self = this;
         let stars = [];
-        return new Promise( async (resolve, reject) => {
+        return new Promise((resolve, reject) => {
             // Method derived from: https://knowledge.udacity.com/questions/282668
             self.chain.forEach(async(block) => {
                 let data = await block.getBData();
-                if(data.address === address) {
-                    stars.push(data);
-                }
+                if(data.address === address) stars.push(data);
             });
+            //Resolve stars by wallet address
             resolve(stars);
+
         });
     }
 
@@ -234,26 +237,45 @@ class Blockchain {
      * 2. Each Block should check the with the previousBlockHash
      */
     validateChain() {
+
         let self = this;
+ 
         let errorLog = [];
-        // method derived from https://knowledge.udacity.com/questions/503694
+ 
         return new Promise(async (resolve, reject) => {
-                self.chain.forEach((block) => {
-                    const validBlock = block.validate();
-                    if(block.height < 1) {
-                        errorLog.push("Genesis Block does not need Verification");
-                    } 
-                    if(await validBlock) {
-                        errorLog.push({
-                            error: 'Block Vailidation Failed'
-                        });
-                    } 
-                    if(await block.hash-1 !== block.previousBlockHash) {
-                        errorLog.push("Hash of previous block does not match");
-                    }
-                });
+ 
+             // use a loop to check the blocks
+ 
+            for (let i = 0; i < this.chain.length; i++) {
+                //create the current block
+                const currentBlock = this.chain[i];
+                // Check if valid
+                if ( !(await currentBlock.validate()) ) {
+                    errorLog.push({
+                        error: 'Failed Validation Process',
+                        block: currentBlock
+                    });
+                }
+                
+                // avoid the genesis block
+                if (i === 0) continue;
+
+                // compare the currentBlock vs previousBlock
+
+                const previousBlock = this.chain[i - 1];
+
+                if (currentBlock.previousBlockHash !== previousBlock.hash) {
+                    errorLog.push({
+                        error: 'Previous block hash does not match',
+                        block: currentBlock
+                    });
+                }
+            }
+            // Resolve with errors
             resolve(errorLog);
+
         });
+
     }
 
 }
