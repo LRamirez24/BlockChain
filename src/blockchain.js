@@ -258,6 +258,7 @@ class Blockchain {
                 }
                 
                 // avoid the genesis block
+                // derieved code from https://knowledge.udacity.com/questions/614073
                 if (i === 0) continue;
 
                 // compare the currentBlock vs previousBlock

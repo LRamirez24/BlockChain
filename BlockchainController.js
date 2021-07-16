@@ -118,7 +118,7 @@ class BlockchainController {
         });
     }
 
-       // This endpoint validates the chain
+       // This endpoint validates the chain for you
        validateChain() {
         this.app.get("/validateChain", async(req, res) => {
             const errorLog = await this.blockchain.validateChain();
