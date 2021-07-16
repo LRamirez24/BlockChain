@@ -81,22 +81,24 @@ class Blockchain {
 
             // Set Block Hash for Current Block
             block.hash = SHA256(JSON.stringify(block)).toString();
+
+
+               // validate the chain before any addition 
+               let validateArray = await self.validateChain();
+               // check the length to ensure no errors
+               if(validateArray.length !== 0) {
+                   resolve({
+                       message: "Blockchain is invalid", error: errorLog, status: false
+                   });
+                   console.log("the number of errors is ", errorLog);
+               }
               //Push Block into Chain
               self.chain.push(block);
               //update Block Height to show changes made
               self.height += 1;
-            //  validate the chain
-            // const validateArray = await self.validateChain();
-            // check the length to ensure no errors
-            // if(validateArray.length !== 0) {
-            //     resolve({
-            //         message: "Blockchain is invalid", error: errorLog, status: false
-            //     });
-            //     console.log("the len is ", errorLog);
-            // }
             //Resolve the new block
             resolve(block);
-            
+
         });
         // SEEMS FINISHED
     }
