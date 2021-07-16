@@ -75,7 +75,7 @@ class Blockchain {
                 block.previousBlockHash = null;
             } else {
                 //set previous Block Hash
-                block.previousBlockHash = self.hash;
+                block.previousBlockHash = this.hash;
             }
 
             // Set Block Hash for Current Block
@@ -248,7 +248,7 @@ class Blockchain {
                             error: 'Block Vailidation Failed'
                         });
                     } 
-                    if(await block.hash != block.previousBlockHash) {
+                    if(await block.hash-1 !== block.previousBlockHash) {
                         errorLog.push("Hash of previous block does not match");
                     }
                 });
