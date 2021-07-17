@@ -88,9 +88,9 @@ class Blockchain {
                // check the length to ensure no errors
                if(validateArray.length !== 0) {
                    resolve({
-                       message: "Blockchain is invalid", error: errorLog, status: false
+                       message: "Blockchain is invalid", error: validateArray, status: false
                    });
-                   console.log("the number of errors is ", errorLog);
+                   console.log("the number of errors is ", validateArray);
                }
               //Push Block into Chain
               self.chain.push(block);
